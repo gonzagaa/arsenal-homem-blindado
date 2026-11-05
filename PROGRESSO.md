@@ -63,6 +63,18 @@ HTML com `no-cache`, `/assets/` com 1 ano (immutable), favicons com 1 semana, te
 - Subtítulo da prova social: "O que os homens mandam para o Marcello **sobre os conteúdos dele.**" (na página e no `docs/copy.md`).
 - `PENDENCIAS.md`: os números, o R$ 297 riscado, a garantia de 7 dias e os prints de DM foram aprovados pelo cliente (os mesmos do Desprezado). Ficam: checkouts, IDs do GTM e do Pixel, pixel e token nos checkouts da Eduzz, política de privacidade e a aprovação da mesa da oferta.
 
-### Conferência depois do primeiro deploy na Hostinger
+## Ajuste de cor: menos vermelho (aprovado em 05/11/2026)
+
+05/11/2026. Pedido do cliente: a página estava vermelha demais. Regra nova: ~90% da página em preto quase neutro, o carmim só como acento.
+
+- Fundo base `#0B0909` (antes `#0A0204`); cards, painéis, checklist, FAQ, barra fixa, contador e galeria em cinza muito escuro levemente quente (`#141112` a `#181314`, translúcido). Nenhum fundo de seção em vinho: o topo das #brechas e a curva da #identificacao em `#131011`, o brilho do fechamento em carmim de 16% (antes `#38000E` chapado), a 404 também.
+- Bordas dos cards em branco com 9% (hover e item marcado com 20%). Ficam em carmim: a borda e o brilho do card do Arsenal nas #brechas, o anel e a seta dos botões, os números da lista da oferta, a pill do hero e os destaques de texto.
+- Brilhos: os dos cards saíram (16 regras); as luzes das seções caíram para menos da metade (#brechas e #oferta, as principais, com 10%; as outras com 7% a 8%); na #autor ficou só a de baixo; o brilho atrás do preço caiu de 30% para 14%.
+- Textos de apoio: os cinzas rosados viraram cinzas levemente quentes, com o mesmo contraste.
+- Hero: uma camada sobre a arte (`.hero-bg::after`, `backdrop-filter: saturate(.8) brightness(.84)`) tira 20% da saturação e escurece, com a faixa dos livros fora da máscara. Medido nos prints: luzes de cima 23% mais escuras, reflexo da mesa 18%, os livros com os mesmos valores de antes. A imagem não mudou; é só tirar a regra para voltar.
+- Mesa e foto do Marcello: o vinho dos fundos ficou mais escuro e menos saturado (constante `VINHO` no `scripts/otimizar-imagens.mjs`: 55% da saturação e 50% do brilho, antes 85% e 70%). Nomes novos por causa do cache de 1 ano: `oferta-mesa-vinho-escuro` e `autor-vinho-escuro`; as versões `-vinho` foram apagadas.
+- Decisão do cliente: o brilho carmim embaixo do anel dos botões fica como está (o mesmo efeito do botão do Desprezado, é ele que chama o clique).
+
+## Conferência depois do primeiro deploy na Hostinger
 
 No domínio: `/` e `/index.html` em 404 com a `404.html`; /bio/, /sdr/, /tfg/, /story/ e /cht/ abrindo a página; um endereço inventado em 404; http e www indo para https sem www; /docs/, /CLAUDE.md e /.git/config sem abrir; HTML com `Cache-Control: no-cache` e /assets/ com 1 ano; resposta comprimida; nenhum arquivo do WordPress antigo sobrando na raiz. As regras do `.htaccess` foram testadas só no `scripts/servidor-local.mjs`; a da raiz usa `[R=404]`, que o LiteSpeed precisa aceitar.

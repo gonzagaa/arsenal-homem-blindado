@@ -11,9 +11,9 @@
 // com qualidade maior, porque texto borra com a compressão pensada para foto.
 //
 // Mesa do palco da oferta: a foto original (oferta-mesa.png, da página De Desprezado a Respeitado) tem a parede
-// azul. O script gera antes a oferta-mesa-vinho.png, com só os tons azuis levados para o vinho da paleta (ver
-// gerarMesaVinho), e é ela que vira as versões otimizadas. A foto do Marcello passa pelo mesmo tratamento, com
-// a roupa protegida (ver gerarAutorVinho): sai a autor-vinho.png.
+// azul. O script gera antes a oferta-mesa-vinho-escuro.png, com só os tons azuis levados para um vinho escuro (ver
+// VINHO e gerarMesaVinho), e é ela que vira as versões otimizadas. A foto do Marcello passa pelo mesmo
+// tratamento, com a roupa protegida (ver gerarAutorVinho): sai a autor-vinho-escuro.png.
 
 import { readdir, stat, mkdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -33,16 +33,17 @@ const LARGURAS = {
   // até 3200 (a imagem é ampliada pelos livros: passa da largura da tela nas telas largas).
   'hero-arsenal-mobile': [640, 828, 1080, 1290],
   'hero-arsenal-desktop': [1280, 1600, 1920, 2560, 3200],
-  // Foto do Marcello (a versão com o fundo vinho, gerada abaixo).
-  'autor-vinho': [400, 640, 900],
+  // Foto do Marcello (a versão com o fundo vinho escuro, gerada abaixo).
+  'autor-vinho-escuro': [400, 640, 900],
   // Capas planas dos quatro manuais (1024x1536, a maior versão fica com 1024): no palco da oferta, até 280px no
   // desktop (2x) e 44% da tela no celular; nos cards das #brechas, até ~260px.
   'capa-arsenal': [360, 540, 800, 1024],
   'capa-traicao': [360, 540, 800, 1024],
   'capa-iluda': [360, 540, 800, 1024],
   'capa-honra': [360, 540, 800, 1024],
-  // Mesa da oferta (a versão vinho, gerada abaixo): 676px no celular, limitada a 2x (1360); até 1600px no desktop.
-  'oferta-mesa-vinho': [960, 1280, 1360, 1672],
+  // Mesa da oferta (a versão vinho escuro, gerada abaixo): 676px no celular, limitada a 2x (1360); até 1600px no
+  // desktop.
+  'oferta-mesa-vinho-escuro': [960, 1280, 1360, 1672],
 };
 // Prints: ~250px na fileira do celular, ~350px no carrossel do desktop e até 737px na galeria.
 // Os originais têm ~737px: 737 é o teto (nunca amplia; a maior versão fica na largura do original).
@@ -160,10 +161,14 @@ async function original(nome) {
   }
   throw new Error(`Original de ${nome} não encontrado em assets/img (png ou jpg).`);
 }
+// O vinho escuro da mesa e da foto do Marcello: cada pixel azul ganha o matiz 348 (vinho) com VINHO.saturacao da
+// saturação e VINHO.brilho do brilho que tinha. Escuro e pouco saturado, para combinar com o fundo quase preto da
+// página (o carmim fica só nos acentos). Mudou um destes valores: troque também os nomes das saídas (o cache de
+// /assets/ é de 1 ano) e o index.html.
+const VINHO = { matiz: 348, saturacao: 0.55, brilho: 0.5 };
 // Mesa do palco: a parede azul da foto original vira vinho. Só os tons azuis mudam (matiz entre ~170 e ~285
 // graus, com transição suave nas pontas); a mesa, o abajur e a poltrona (matizes quentes, de 0 a 40 graus) ficam
-// como estão. Cada pixel azul ganha o matiz 348 (vinho, entre o #38000E e o #BB003D da página), 85% da saturação
-// e 70% do brilho: no mesmo brilho, o vermelho parece mais claro que o azul. Só refaz se o original mudar.
+// como estão. Só refaz se o original mudar.
 function hsv(r, g, b) {
   const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
   let h = 0;
@@ -178,7 +183,7 @@ function rgb(h, s, v) {
 const rampa = (a, b, x) => Math.min(1, Math.max(0, (x - a) / (b - a)));
 async function gerarMesaVinho() {
   const origem = path.join(ORIGEM, 'oferta-mesa.png');
-  const saida = path.join(ORIGEM, 'oferta-mesa-vinho.png');
+  const saida = path.join(ORIGEM, 'oferta-mesa-vinho-escuro.png');
   if (await atualizado(saida, (await stat(origem)).mtimeMs)) return;
   const { data, info } = await sharp(origem).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const out = Buffer.from(data);
@@ -187,7 +192,7 @@ async function gerarMesaVinho() {
     const [h, s, v] = hsv(r, g, b);
     const peso = rampa(170, 195, h) * (1 - rampa(255, 285, h));
     if (peso <= 0) continue;
-    const [nr, ng, nb] = rgb(348, Math.min(1, s * 0.85), v * 0.7);
+    const [nr, ng, nb] = rgb(VINHO.matiz, Math.min(1, s * VINHO.saturacao), v * VINHO.brilho);
     out[i] = Math.round((r + (nr - r) * peso) * 255);
     out[i + 1] = Math.round((g + (ng - g) * peso) * 255);
     out[i + 2] = Math.round((b + (nb - b) * peso) * 255);
@@ -204,7 +209,7 @@ async function gerarMesaVinho() {
 // 3. Onde o fundo desfocado tem a mesma cor do blazer, polígonos medidos na foto (1122x1402) marcam o fundo: o
 //    canto de baixo à direita (a máscara automática fica desligada ali, porque pegava a borda da manga), o vão
 //    entre a mão e o corpo e a fresta entre o corpo e a manga direita.
-// Dentro da máscara, todo tom azul vai para o mesmo vinho da mesa (matiz 348, 85% da saturação, 70% do brilho).
+// Dentro da máscara, todo tom azul vai para o mesmo vinho escuro da mesa (VINHO).
 // A pele, o cabelo, a barba, o blazer, a camiseta, a poltrona e o abajur ficam como estão. Com outra foto, meça
 // de novo os polígonos. Só refaz se o original mudar.
 const AUTOR_FUNDO = [
@@ -226,7 +231,7 @@ function dentro(x, y, pol) {
 }
 async function gerarAutorVinho() {
   const origem = path.join(ORIGEM, 'autor.png');
-  const saida = path.join(ORIGEM, 'autor-vinho.png');
+  const saida = path.join(ORIGEM, 'autor-vinho-escuro.png');
   if (await atualizado(saida, (await stat(origem)).mtimeMs)) return;
   const { data, info } = await sharp(origem).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: W, height: H } = info;
@@ -261,7 +266,7 @@ async function gerarAutorVinho() {
     if (peso <= 0) continue;
     const r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
     const [, s, v] = hsv(r, g, b);
-    const [nr, ng, nb] = rgb(348, Math.min(1, s * 0.85), v * 0.7);
+    const [nr, ng, nb] = rgb(VINHO.matiz, Math.min(1, s * VINHO.saturacao), v * VINHO.brilho);
     out[i] = Math.round((r + (nr - r) * peso) * 255);
     out[i + 1] = Math.round((g + (ng - g) * peso) * 255);
     out[i + 2] = Math.round((b + (nb - b) * peso) * 255);
@@ -272,7 +277,7 @@ async function gerarAutorVinho() {
 await gerarMesaVinho();
 await gerarAutorVinho();
 for (const [nome, larguras] of Object.entries(LARGURAS)) {
-  const qualidade = HEROS.has(nome) ? HERO : CAPAS.has(nome) ? CAPA : nome === 'autor-vinho' ? RETRATO : FOTO;
+  const qualidade = HEROS.has(nome) ? HERO : CAPAS.has(nome) ? CAPA : nome === 'autor-vinho-escuro' ? RETRATO : FOTO;
   await gerar(await original(nome), nome, larguras, qualidade);
 }
 for (const arquivo of await listarPrints()) {

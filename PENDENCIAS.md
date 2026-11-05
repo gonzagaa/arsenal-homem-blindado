@@ -11,7 +11,7 @@ Nada marcado com `.pendente` vai ao ar. Atualize esta lista conforme as resposta
 
 ## Insumos
 
-- [ ] **Mesa da oferta:** a parede azul da foto do Desprezado foi levada para o vinho pelo `scripts/otimizar-imagens.mjs` (`oferta-mesa-vinho`; só os tons azuis mudaram, a mesa, o abajur e a poltrona ficaram iguais). Aguardando o cliente aprovar ou mandar uma mesa nova.
+- [ ] **Mesa da oferta:** a parede azul da foto do Desprezado foi levada para um vinho escuro pelo `scripts/otimizar-imagens.mjs` (`oferta-mesa-vinho-escuro`; só os tons azuis mudaram, a mesa, o abajur e a poltrona ficaram iguais). Aguardando o cliente aprovar ou mandar uma mesa nova.
 
 ## Marcações `.pendente` na página (0)
 

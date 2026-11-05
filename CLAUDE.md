@@ -37,7 +37,7 @@ Se algo não estiver coberto pela copy nem por este arquivo, pergunte antes de i
 - Site estático. Na raiz, o `index.html` (a página de vendas) e a `404.html` (a página de erro), cada um com CSS e JS inline. Única exceção: o Lenis, em `assets/js/lenis.min.js`, baixado depois do load. Sem framework, sem build obrigatório, sem jQuery.
 - Não há página de links: a raiz do domínio responde 404.
 - Todo arquivo do projeto (imagens, fontes, favicons, preload, srcset, `url()` do CSS) é pedido a partir da raiz (`/assets/...`, `/favicon.svg`): a mesma página abre em `/bio/`, `/sdr/` e nas outras rotas, e um caminho relativo viraria `/bio/assets/...`. Links de âncora (`#oferta`) continuam como estão.
-- Originais em `assets/img/`: `hero-arsenal-desktop.png` e `hero-arsenal-mobile.png`, as capas planas `capa-arsenal.png`, `capa-traicao.png`, `capa-iluda.png` e `capa-honra.png` (1024x1536, copiadas de `_entrada/`), `autor.png` (a foto do Desprezado, com o fundo azul, de onde sai a `autor-vinho.png`), `oferta-mesa.png` (a original azul, de onde sai a `oferta-mesa-vinho.png`), `grain.png` e os prints em `prints/`.
+- Originais em `assets/img/`: `hero-arsenal-desktop.png` e `hero-arsenal-mobile.png`, as capas planas `capa-arsenal.png`, `capa-traicao.png`, `capa-iluda.png` e `capa-honra.png` (1024x1536, copiadas de `_entrada/`), `autor.png` (a foto do Desprezado, com o fundo azul, de onde sai a `autor-vinho-escuro.png`), `oferta-mesa.png` (a original azul, de onde sai a `oferta-mesa-vinho-escuro.png`), `grain.png` e os prints em `prints/`.
 - Imagens otimizadas em `assets/img/opt/`, em AVIF e WebP com fallback JPG, servidas por `<picture>` com `srcset` e `sizes`, geradas pelo `scripts/otimizar-imagens.mjs` (`npm install --prefix scripts` uma vez; `node scripts/otimizar-imagens.mjs` gera só o que mudou, `--tudo` refaz). Toda `<img>` com `width` e `height`. Fora o hero, as imagens ficam limitadas a 2x no celular (até 760 px de tela, o `sizes` encolhe com densidade alta: x0,8 a partir de 2,4 dppx e x2/3 a partir de 2,9 dppx). O hero vai até 3x. As capas dos manuais precisam sair com os títulos nítidos.
 - Fonte: Geist hospedada localmente (`assets/fonts/geist-latin.woff2`, variável, subset latino, licença OFL ao lado), com `preload` e `font-display: swap`. Nenhuma outra família.
 - Mobile-first de verdade. Testar em 390 px antes de qualquer outra largura.
@@ -75,14 +75,20 @@ Mesma estrutura e o mesmo sistema visual da identidade oficial do Desprezado (an
 
 | Uso | Valor |
 | --- | --- |
-| Fundo base | `#0A0204` (quase preto com tom vinho) |
-| Áreas de destaque | `#38000E` |
-| Cor principal | carmim `#BB003D` |
+Regra: ~90% da página em preto quase neutro, levemente quente; o carmim só como acento. Nenhum fundo vinho.
+
+| Uso | Valor |
+| --- | --- |
+| Fundo base | `#0B0909` (quase preto, levemente quente) |
+| Cards e painéis | cinza muito escuro levemente quente, `#141112` a `#181314` (translúcido: `rgba(24,19,20,a)` para `rgba(20,17,18,a)`) |
+| Bordas dos cards | branco com 9% (`rgba(255,255,255,.09)`); hover e item marcado com 20% |
+| Acento carmim | `#BB003D`: o card do Arsenal nas #brechas (borda e brilho), o anel e a seta dos botões, os números da lista da oferta, a pill do hero |
 | Círculo da seta e anéis | degradê `#E0185A` para `#7A0026` |
 | Destaques de texto (o trecho em negrito de cada título, preços) | degradê carmim para dourado, `#E0185A` para `#F2B33D`, como nos títulos das capas |
 | Detalhes finos (filetes, ícone do escudo) | dourado `#D9B26A`, sem exagero |
+| Textos de apoio | cinzas levemente quentes (`#C4BCBD`, `#A69FA0`, `#E2DCDC`), nunca rosados |
 
-Nenhum neon, roxo, nem o azul do Desprezado. Contraste AA (4,5:1) em todo texto.
+Luzes das seções: carmim com no máximo 10% de opacidade (a das #brechas e a da #oferta, as principais) e 7% a 8% nas outras; os cards não têm brilho carmim, exceto o do Arsenal. Nenhum neon, roxo, nem o azul do Desprezado. Contraste AA (4,5:1) em todo texto.
 
 ### Tipografia
 
@@ -103,7 +109,7 @@ Nenhum neon, roxo, nem o azul do Desprezado. Contraste AA (4,5:1) em todo texto.
 ### Regras que não se negociam
 
 - Nenhuma divisão seca entre seções: sempre há degradê, luz que atravessa, imagem que começa antes ou elemento sobre a emenda. No desktop, no máximo uns 200 px de vazio entre seções.
-- O fundo do hero é a arte com os quatro livros: os livros nunca são cortados nas laterais, e o texto nunca cobre as capas. As versões celular e desktop mostram a mesma cena (celular: livros em cima e fundo escuro embaixo; desktop: livros à direita e lado esquerdo escuro).
+- O fundo do hero é a arte com os quatro livros: os livros nunca são cortados nas laterais, e o texto nunca cobre as capas. Sobre a arte, uma camada (`.hero-bg::after`, `backdrop-filter: saturate(.8) brightness(.84)`) tira 20% da saturação e escurece as luzes de cima e o reflexo da mesa, com a faixa dos livros fora da máscara (as capas e o brilho atrás delas ficam iguais). É reversível: basta tirar a regra. As versões celular e desktop mostram a mesma cena (celular: livros em cima e fundo escuro embaixo; desktop: livros à direita e lado esquerdo escuro).
 - Rótulo de seção é texto em caixa normal com o pequeno escudo. Nunca caixa alta com letras espaçadas, exceto a pill do hero.
 - Nunca colocar hover em elemento que não é clicável.
 - Nunca usar: fonte condensada, Inter, Roboto, emoji, cards idênticos com ícone, animação de entrada fora do Sistema de movimento, gradiente roxo, cantos e sombras iguais em tudo.
@@ -125,8 +131,8 @@ Mesmo esquema do hero de livros do Desprezado: art direction com `<picture>` (`h
 1. `#hero`: rótulo (pill com o escudo), H1, subheadline, botão grande e dois cards de vidro (419 mil seguidores, +12 mil homens).
 2. `#identificacao`: checklist interativo de 5 itens com contador, o texto que aparece a partir do primeiro item marcado e o destaque final.
 3. `#brechas`: cada card tem a brecha (título), o manual que a fecha (com o escudo dourado) e o que ele resolve, com a capa do manual (`capa-*`). O do Arsenal Homem Blindado em destaque: no celular, o mesmo formato horizontal dos outros (capa ao lado do texto), com a capa 20% maior (110 px, contra 92) e o destaque só na borda e no brilho carmim; no tablet, na largura da coluna com a capa ao lado; a partir de 1024 px, na largura toda no topo, e os outros três lado a lado embaixo. Frase de fechamento, botão e, na emenda com a `#oferta`, o escudo que se enche de dourado com a rolagem (no desktop, a foto do palco começa por trás do fim da seção).
-4. `#oferta`: o palco com a mesa vinho (`oferta-mesa-vinho`, a foto da mesa do Desprezado com a parede azul levada para o vinho pelo `scripts/otimizar-imagens.mjs`) e os quatro manuais em pé na ordem da arte do hero (Traição, Iluda, Arsenal, Honra), o Arsenal maior e na frente, os outros girados para dentro; no celular, lado a lado e sem sobreposição (sobrepostos, os títulos eram cortados). Painel com a lista dos quatro manuais (número no círculo) e o bloco de preço (frase, "De R$ 297 por" riscado, "12x de", "R$ 10,03" grande, "ou R$ 97 à vista", botão e nota).
-5. `#autor`: o card do Marcello (a mesma foto do Desprezado, `autor-vinho`: só o fundo azul do estúdio levado para o vinho pelo `scripts/otimizar-imagens.mjs`, com a pele e a roupa protegidas; o blazer também é azul, por isso a máscara e os polígonos medidos em `gerarAutorVinho`) e a prova social "Direto da DM" com subtítulo e apoio: 6 dos 8 prints tratados no Desprezado, os que mais falam de traição, separação, decisão e postura, nesta ordem: 04, 03, 06, 01, 02 e 08. O carrossel do desktop mede 6 x 360 = 2160 px por volta, em 54 s (o JS conta os cards sozinho; no CSS, ajuste os 2160px e os 54s se mudar a quantidade). Botão no fim.
+4. `#oferta`: o palco com a mesa (`oferta-mesa-vinho-escuro`, a foto da mesa do Desprezado com a parede azul levada para um vinho escuro e pouco saturado pelo `scripts/otimizar-imagens.mjs`, constante `VINHO`) e os quatro manuais em pé na ordem da arte do hero (Traição, Iluda, Arsenal, Honra), o Arsenal maior e na frente, os outros girados para dentro; no celular, lado a lado e sem sobreposição (sobrepostos, os títulos eram cortados). Painel com a lista dos quatro manuais (número no círculo) e o bloco de preço (frase, "De R$ 297 por" riscado, "12x de", "R$ 10,03" grande, "ou R$ 97 à vista", botão e nota).
+5. `#autor`: o card do Marcello (a mesma foto do Desprezado, `autor-vinho-escuro`: só o fundo azul do estúdio levado para o mesmo vinho escuro pelo `scripts/otimizar-imagens.mjs`, com a pele e a roupa protegidas; o blazer também é azul, por isso a máscara e os polígonos medidos em `gerarAutorVinho`) e a prova social "Direto da DM" com subtítulo e apoio: 6 dos 8 prints tratados no Desprezado, os que mais falam de traição, separação, decisão e postura, nesta ordem: 04, 03, 06, 01, 02 e 08. O carrossel do desktop mede 6 x 360 = 2160 px por volta, em 54 s (o JS conta os cards sozinho; no CSS, ajuste os 2160px e os 54s se mudar a quantidade). Botão no fim.
 6. `#faq`: a garantia (`id="garantia"`) e as perguntas.
 7. `#fechamento`: título grande, texto, bloco de compra; depois, o rodapé.
 8. Barra fixa no celular.
