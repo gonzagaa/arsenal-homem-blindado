@@ -75,6 +75,16 @@ HTML com `no-cache`, `/assets/` com 1 ano (immutable), favicons com 1 semana, te
 - Mesa e foto do Marcello: o vinho dos fundos ficou mais escuro e menos saturado (constante `VINHO` no `scripts/otimizar-imagens.mjs`: 55% da saturação e 50% do brilho, antes 85% e 70%). Nomes novos por causa do cache de 1 ano: `oferta-mesa-vinho-escuro` e `autor-vinho-escuro`; as versões `-vinho` foram apagadas.
 - Decisão do cliente: o brilho carmim embaixo do anel dos botões fica como está (o mesmo efeito do botão do Desprezado, é ele que chama o clique).
 
+## Ajuste de cor: meio-termo entre o vinho e a quase preta (aprovado em 05/11/2026)
+
+05/11/2026. Pedido do cliente: a versão quase preta (72df657) foi longe demais. O vermelho volta nos fundos, mais escuro, no meio do caminho até a versão vinho (d61f944).
+
+- Fundos, superfícies e textos de apoio: cada cor é a média exata, canal a canal, entre a versão vinho e a quase preta (base `#0B0607`, entre `#0A0204` e `#0B0909`; topo das #brechas `#180A0D`; fechamento com centro `#2A040E`). Vale para seções, cards, painéis, barra fixa, contador, galeria, FAQ, garantia, bloco de compra e a 404.
+- Luzes das seções, a do fechamento e a atrás do preço: opacidade no meio entre as duas. Na #autor, a segunda luz voltou com metade da força original.
+- Brilhos e bordas carmim dos cards: voltaram com metade da força original. O card do Arsenal, o anel dos botões e os números da oferta continuam cheios.
+- Hero: a camada de tratamento com metade da força (`saturate(.9) brightness(.92)`). Mesa e foto do Marcello ficaram como estavam (`-vinho-escuro`).
+- Todos esses valores ficam agrupados em variáveis no `:root` (fundos, superfícies, bordas e brilhos dos cards, luzes, hero, textos, acentos), cada um com os dois valores de origem no comentário. Bordas e brilhos dos cards são multiplicadores (`--borda-cards` e `--brilho-cards`, hoje .5: 1 volta à versão vinho, 0 tira o carmim).
+
 ## Conferência depois do primeiro deploy na Hostinger
 
 No domínio: `/` e `/index.html` em 404 com a `404.html`; /bio/, /sdr/, /tfg/, /story/ e /cht/ abrindo a página; um endereço inventado em 404; http e www indo para https sem www; /docs/, /CLAUDE.md e /.git/config sem abrir; HTML com `Cache-Control: no-cache` e /assets/ com 1 ano; resposta comprimida; nenhum arquivo do WordPress antigo sobrando na raiz. As regras do `.htaccess` foram testadas só no `scripts/servidor-local.mjs`; a da raiz usa `[R=404]`, que o LiteSpeed precisa aceitar.

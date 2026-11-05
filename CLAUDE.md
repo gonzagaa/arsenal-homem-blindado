@@ -73,22 +73,25 @@ Mesma estrutura e o mesmo sistema visual da identidade oficial do Desprezado (an
 
 ### Cores
 
-| Uso | Valor |
-| --- | --- |
-Regra: ~90% da página em preto quase neutro, levemente quente; o carmim só como acento. Nenhum fundo vinho.
+Regra: fundos num vinho escuro puxado para o preto; o carmim cheio só nos acentos. É o meio-termo entre a versão vinho (commit `d61f944`) e a quase preta (`72df657`): cada cor de fundo, superfície e texto de apoio é a média exata, canal a canal, entre as duas.
+
+Todos os valores ficam em variáveis no `:root` do `index.html` (no modelo, bloco "Tokens"), agrupados (fundos, superfícies, bordas e brilhos dos cards, luzes, hero, textos, acentos), cada um com os dois valores de origem no comentário. Para mudar a intensidade, mexa só ali.
 
 | Uso | Valor |
 | --- | --- |
-| Fundo base | `#0B0909` (quase preto, levemente quente) |
-| Cards e painéis | cinza muito escuro levemente quente, `#141112` a `#181314` (translúcido: `rgba(24,19,20,a)` para `rgba(20,17,18,a)`) |
-| Bordas dos cards | branco com 9% (`rgba(255,255,255,.09)`); hover e item marcado com 20% |
-| Acento carmim | `#BB003D`: o card do Arsenal nas #brechas (borda e brilho), o anel e a seta dos botões, os números da lista da oferta, a pill do hero |
+| Fundo base | `--abismo: #0B0607` (entre `#0A0204` e `#0B0909`) |
+| Seções em vinho | `--secao-topo: #180A0D` (topo das #brechas e a curva da #identificacao), `--secao-meio: #11080C`; fechamento com `--fecho-centro: #2A040E` e `--fecho-meio: #140609` |
+| Cards e painéis | `--card-rgb: 36,14,19` em cima e `--card-fundo-rgb: 19,10,13` embaixo (a opacidade fica em cada regra); campos, barra fixa, preço e item marcado com variáveis próprias |
+| Bordas dos cards | carmim com metade da opacidade original (`--borda-cards: .5`) |
+| Brilhos dos cards | carmim com metade da força original (`--brilho-cards: .5`) |
+| Luzes das seções | uma variável por luz (`--luz-*`), com a opacidade no meio entre as duas versões |
+| Acento carmim cheio | `#BB003D`: o card do Arsenal nas #brechas (borda e brilho), o anel e a seta dos botões, os números da lista da oferta, a pill do hero |
 | Círculo da seta e anéis | degradê `#E0185A` para `#7A0026` |
 | Destaques de texto (o trecho em negrito de cada título, preços) | degradê carmim para dourado, `#E0185A` para `#F2B33D`, como nos títulos das capas |
 | Detalhes finos (filetes, ícone do escudo) | dourado `#D9B26A`, sem exagero |
-| Textos de apoio | cinzas levemente quentes (`#C4BCBD`, `#A69FA0`, `#E2DCDC`), nunca rosados |
+| Textos de apoio | `--nevoa: #C5B9BB`, `--nevoa-2: #A79C9E` e os outros `--texto-*`, entre o cinza rosado e o quente |
 
-Luzes das seções: carmim com no máximo 10% de opacidade (a das #brechas e a da #oferta, as principais) e 7% a 8% nas outras; os cards não têm brilho carmim, exceto o do Arsenal. Nenhum neon, roxo, nem o azul do Desprezado. Contraste AA (4,5:1) em todo texto.
+Nos atributos de SVG (que não aceitam `var()`), o valor do meio vai escrito: a `meta theme-color`, os traços `#EBE1E2` e o fundo da medalha da garantia. A curva da #identificacao e o escudo do card do autor pegam `--secao-topo` pelo CSS. Nenhum neon, roxo, nem o azul do Desprezado. Contraste AA (4,5:1) em todo texto.
 
 ### Tipografia
 
@@ -109,7 +112,7 @@ Luzes das seções: carmim com no máximo 10% de opacidade (a das #brechas e a d
 ### Regras que não se negociam
 
 - Nenhuma divisão seca entre seções: sempre há degradê, luz que atravessa, imagem que começa antes ou elemento sobre a emenda. No desktop, no máximo uns 200 px de vazio entre seções.
-- O fundo do hero é a arte com os quatro livros: os livros nunca são cortados nas laterais, e o texto nunca cobre as capas. Sobre a arte, uma camada (`.hero-bg::after`, `backdrop-filter: saturate(.8) brightness(.84)`) tira 20% da saturação e escurece as luzes de cima e o reflexo da mesa, com a faixa dos livros fora da máscara (as capas e o brilho atrás delas ficam iguais). É reversível: basta tirar a regra. As versões celular e desktop mostram a mesma cena (celular: livros em cima e fundo escuro embaixo; desktop: livros à direita e lado esquerdo escuro).
+- O fundo do hero é a arte com os quatro livros: os livros nunca são cortados nas laterais, e o texto nunca cobre as capas. Sobre a arte, uma camada (`.hero-bg::after`, `backdrop-filter`, com a força em `--hero-saturacao: .9` e `--hero-brilho: .92` no `:root`) tira 10% da saturação e escurece as luzes de cima e o reflexo da mesa, com a faixa dos livros fora da máscara (as capas e o brilho atrás delas ficam iguais). É reversível: basta tirar a regra. As versões celular e desktop mostram a mesma cena (celular: livros em cima e fundo escuro embaixo; desktop: livros à direita e lado esquerdo escuro).
 - Rótulo de seção é texto em caixa normal com o pequeno escudo. Nunca caixa alta com letras espaçadas, exceto a pill do hero.
 - Nunca colocar hover em elemento que não é clicável.
 - Nunca usar: fonte condensada, Inter, Roboto, emoji, cards idênticos com ícone, animação de entrada fora do Sistema de movimento, gradiente roxo, cantos e sombras iguais em tudo.
