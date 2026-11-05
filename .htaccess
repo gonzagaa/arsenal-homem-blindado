@@ -1,0 +1,110 @@
+# De Desprezado a Respeitado: configuração da hospedagem final (Hostinger, LiteSpeed compatível com Apache).
+# Deploy pelo Git a partir deste repositório, na raiz do domínio. O _redirects é o equivalente para a prévia na
+# Netlify: mudou uma rota aqui, mude lá também. Todo bloco que depende de módulo fica num <IfModule>: se o
+# módulo não estiver ativo, o bloco é ignorado e o resto continua valendo.
+
+# Sem listagem de pastas (sem isso, /assets/img/ mostraria a lista de arquivos). A raiz é a página de links do
+# Marcello (links.html): o DirectoryIndex aponta para ela e a reescrita lá embaixo também, então vale o que o
+# servidor resolver primeiro. O endereço na barra continua "/".
+DirectoryIndex links.html
+Options -Indexes
+
+# Página 404: a 404.html (sem botão de compra, sem rastreio, noindex), com status 404. Vale para o pedido direto
+# de /index.html e de /links.html e para qualquer endereço que não exista. Os caminhos dela começam na raiz
+# (/assets/...), então ela abre inteira em qualquer profundidade.
+ErrorDocument 404 /404.html
+
+# Arquivos internos do projeto: respondem 404, como se não existissem (documentação, scripts, dependências,
+# Git, configurações da Netlify (_redirects e _headers) e deste arquivo, qualquer .md, README e package*.json). Pastas e arquivos que
+# começam com ponto também, menos /.well-known/ (usado na emissão do certificado SSL).
+<IfModule mod_alias.c>
+  RedirectMatch 404 (?i)(^|/)(docs|scripts|node_modules)(/|$)
+  RedirectMatch 404 (?i)/\.(?!well-known(/|$))
+  RedirectMatch 404 (?i)\.md$
+  RedirectMatch 404 (?i)(^|/)readme([.][^/]*)?$
+  RedirectMatch 404 (?i)(^|/)package(-lock)?\.json$
+  RedirectMatch 404 (?i)(^|/)_(redirects|headers)$
+</IfModule>
+# Reforço sem depender do mod_alias: os mesmos arquivos negados (403) pelo nome.
+<FilesMatch "(?i)(^\.|\.md$|^readme|^package(-lock)?\.json$|^_(redirects|headers)$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # www para o domínio sem www, já em https (301), num salto só.
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+  # http para https (301). A segunda condição evita laço quando há um proxy ou CDN na frente que já recebeu em
+  # https e repassa em http.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # Reforço do bloqueio de pastas internas, caso o mod_alias não esteja ativo (a resposta é 403).
+  RewriteRule (?:^|/)(?:docs|scripts|node_modules|\.git)(?:/|$) - [F,NC,L]
+
+  # O pedido direto das duas páginas (/index.html e /links.html, com ou sem query string) responde 404, com a
+  # 404.html: elas só abrem pelos endereços delas (a raiz e as cinco rotas). O THE_REQUEST é a linha do pedido
+  # original ("GET / HTTP/1.1") e não muda nas reescritas internas: a raiz servida como links.html (pela
+  # reescrita ou pelo DirectoryIndex) e o /bio/ reescrito para o index.html não caem aqui, e a 404.html servida
+  # como página de erro fica fora do padrão (sem laço).
+  RewriteCond %{THE_REQUEST} ^[A-Z]+\s(?:https?://[^/\s]+)?/+(?:index|links)\.html(?:\?\S*)?\s [NC]
+  RewriteRule ^(?:index|links)\.html$ - [R=404,NC,L]
+
+  # Raiz: a página de links do Marcello, por reescrita interna (o endereço na barra continua "/"; a query
+  # string segue junto).
+  RewriteRule ^$ /links.html [L]
+
+  # Origens de tráfego: /bio, /sdr, /tfg, /story e /cht, com ou sem barra e em qualquer caixa, servem o index.html
+  # por reescrita interna (o endereço na barra não muda; a query string segue junto). O script do checkout lê
+  # o primeiro segmento do caminho e escolhe o link do CHECKOUTS.
+  RewriteRule ^(bio|sdr|tfg|story|cht)/?$ /index.html [NC,L]
+</IfModule>
+
+# Tipos corretos para os formatos que hospedagens antigas não conhecem.
+<IfModule mod_mime.c>
+  AddType image/avif .avif
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+  AddType image/svg+xml .svg
+  AddType text/javascript .js
+  AddCharset utf-8 .html .css .js .svg .json
+</IfModule>
+
+# Compressão: brotli onde houver (melhor) e gzip para o resto. Quem recebe brotli não recebe gzip (o mod_deflate
+# não comprime o que já veio comprimido). No LiteSpeed, a compressão costuma vir ligada pelo servidor.
+<IfModule mod_filter.c>
+  <IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/css text/javascript application/javascript application/json image/svg+xml text/plain
+  </IfModule>
+  <IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml text/plain
+  </IfModule>
+</IfModule>
+
+# Cache: o HTML é revalidado a cada visita (no-cache), para uma atualização aparecer na hora. Os favicons da raiz
+# ficam uma semana. A pasta assets/ tem o próprio .htaccess, com cache de 1 ano (immutable).
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.html?$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "^(favicon\.(svg|ico)|favicon-32\.png|apple-touch-icon\.png)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+  # O navegador não "adivinha" o tipo de um arquivo diferente do declarado.
+  Header always set X-Content-Type-Options "nosniff"
+</IfModule>

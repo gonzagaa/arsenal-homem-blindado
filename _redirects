@@ -1,0 +1,43 @@
+# Netlify (prévia). O mesmo comportamento do .htaccess (Hostinger): a raiz é a página de links do Marcello e as
+# cinco rotas vendem. A ordem importa: vale a primeira regra que casar. O "!" força a regra mesmo quando o
+# arquivo existe: o index.html existe de verdade e, sem o "!", seria servido na raiz e em /index.html.
+
+# Arquivos internos do projeto: 404 com a 404.html (forçado, antes de tudo), o mesmo bloqueio do .htaccess.
+# A Netlify não aceita padrão por extensão (*.md): cada .md da raiz vai pelo nome; um .md novo na raiz entra aqui.
+# Os arquivos com ponto (.htaccess, .gitignore), o _redirects e o _headers a Netlify já não publica, e a
+# _entrada/ fica fora do git; as regras dela e do node_modules/ são reserva.
+/docs            /404.html    404!
+/docs/*          /404.html    404!
+/scripts         /404.html    404!
+/scripts/*       /404.html    404!
+/_entrada        /404.html    404!
+/_entrada/*      /404.html    404!
+/node_modules/*  /404.html    404!
+/CLAUDE.md       /404.html    404!
+/PENDENCIAS.md   /404.html    404!
+/PROGRESSO.md    /404.html    404!
+/README.md       /404.html    404!
+
+# Raiz: a página de links (links.html), com o endereço "/" na barra (forçado).
+/             /links.html  200!
+
+# O pedido direto das duas páginas responde 404 com a 404.html (forçado).
+/index.html   /404.html    404!
+/links.html   /404.html    404!
+
+# Origens de tráfego: a mesma página (o /index.html) nas cinco rotas, com o endereço na barra mantido.
+# O script do checkout lê o primeiro segmento do caminho e escolhe o link do CHECKOUTS (index.html).
+/bio          /index.html  200
+/bio/         /index.html  200
+/sdr          /index.html  200
+/sdr/         /index.html  200
+/tfg          /index.html  200
+/tfg/         /index.html  200
+/story        /index.html  200
+/story/       /index.html  200
+/cht          /index.html  200
+/cht/         /index.html  200
+
+# Qualquer outro endereço: 404 com a 404.html. Sem o "!", a regra só vale quando o arquivo não existe:
+# /assets/..., os favicons e a própria 404.html continuam servidos normalmente.
+/*            /404.html    404

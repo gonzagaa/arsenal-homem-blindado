@@ -1,0 +1,13 @@
+# Dependências locais dos scripts (recriar com: npm install --prefix scripts)
+scripts/node_modules/
+
+# Arquivos do sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# assets/img/opt/ e assets/js/lenis.min.js ficam DENTRO do repositório,
+# para outra máquina não precisar gerar nada.
+
+# Insumos recebidos (originais e referências do mockup), fora do repositório
+_entrada/

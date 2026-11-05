@@ -1,0 +1,52 @@
+# Netlify (prévia): o mesmo cache do .htaccess e do assets/.htaccess (Hostinger), para a prévia medir igual à
+# produção. Quando duas regras casam com o mesmo endereço e definem o mesmo cabeçalho, a Netlify junta os
+# valores: por isso o Cache-Control vai em caminhos que não se sobrepõem.
+
+# assets/ (imagens, fonte, Lenis): 1 ano, immutable. Os nomes não têm versão: para trocar um arquivo, use um
+# nome novo.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML: revalidado a cada visita, para uma atualização aparecer na hora (as rotas, a raiz e as três páginas).
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/links.html
+  Cache-Control: no-cache
+/404.html
+  Cache-Control: no-cache
+/bio
+  Cache-Control: no-cache
+/bio/
+  Cache-Control: no-cache
+/sdr
+  Cache-Control: no-cache
+/sdr/
+  Cache-Control: no-cache
+/tfg
+  Cache-Control: no-cache
+/tfg/
+  Cache-Control: no-cache
+/story
+  Cache-Control: no-cache
+/story/
+  Cache-Control: no-cache
+/cht
+  Cache-Control: no-cache
+/cht/
+  Cache-Control: no-cache
+
+# Favicons da raiz: 1 semana.
+/favicon.svg
+  Cache-Control: public, max-age=604800
+/favicon.ico
+  Cache-Control: public, max-age=604800
+/favicon-32.png
+  Cache-Control: public, max-age=604800
+/apple-touch-icon.png
+  Cache-Control: public, max-age=604800
+
+# O navegador não "adivinha" o tipo de um arquivo diferente do declarado.
+/*
+  X-Content-Type-Options: nosniff
