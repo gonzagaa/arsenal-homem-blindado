@@ -37,6 +37,7 @@ Se algo não estiver coberto pela copy nem por este arquivo, pergunte antes de i
 - Site estático. Na raiz, o `index.html` (a página de vendas) e a `404.html` (a página de erro), cada um com CSS e JS inline. Única exceção: o Lenis, em `assets/js/lenis.min.js`, baixado depois do load. Sem framework, sem build obrigatório, sem jQuery.
 - Não há página de links: a raiz do domínio responde 404.
 - Todo arquivo do projeto (imagens, fontes, favicons, preload, srcset, `url()` do CSS) é pedido a partir da raiz (`/assets/...`, `/favicon.svg`): a mesma página abre em `/bio/`, `/sdr/` e nas outras rotas, e um caminho relativo viraria `/bio/assets/...`. Links de âncora (`#oferta`) continuam como estão.
+- Originais em `assets/img/`: `hero-arsenal-desktop.png` e `hero-arsenal-mobile.png`, as capas planas `capa-arsenal.png`, `capa-traicao.png`, `capa-iluda.png` e `capa-honra.png` (1024x1536, copiadas de `_entrada/`), `autor.png` (a foto do Desprezado, com o fundo azul, de onde sai a `autor-vinho.png`), `oferta-mesa.png` (a original azul, de onde sai a `oferta-mesa-vinho.png`), `grain.png` e os prints em `prints/`.
 - Imagens otimizadas em `assets/img/opt/`, em AVIF e WebP com fallback JPG, servidas por `<picture>` com `srcset` e `sizes`, geradas pelo `scripts/otimizar-imagens.mjs` (`npm install --prefix scripts` uma vez; `node scripts/otimizar-imagens.mjs` gera só o que mudou, `--tudo` refaz). Toda `<img>` com `width` e `height`. Fora o hero, as imagens ficam limitadas a 2x no celular (até 760 px de tela, o `sizes` encolhe com densidade alta: x0,8 a partir de 2,4 dppx e x2/3 a partir de 2,9 dppx). O hero vai até 3x. As capas dos manuais precisam sair com os títulos nítidos.
 - Fonte: Geist hospedada localmente (`assets/fonts/geist-latin.woff2`, variável, subset latino, licença OFL ao lado), com `preload` e `font-display: swap`. Nenhuma outra família.
 - Mobile-first de verdade. Testar em 390 px antes de qualquer outra largura.
@@ -49,7 +50,7 @@ Se algo não estiver coberto pela copy nem por este arquivo, pergunte antes de i
 - Final: a Hostinger do cliente (LiteSpeed compatível com Apache), com deploy pelo Git a partir deste repositório, na raiz do domínio. Configuração no `.htaccess` da raiz: rotas (reescrita interna), http para https e www para sem www (301), bloqueio dos arquivos internos (`docs/`, `scripts/`, `node_modules/`, `.git`, qualquer `.md`, README, `package*.json`, `_redirects`, `_headers` e os `.htaccess`), compressão, tipos (avif, webp, woff2), `no-cache` no HTML, a página de erro `404.html` (status 404).
 - Cache de 1 ano (immutable) de `assets/` no `assets/.htaccess`. Os nomes não têm versão: para trocar um arquivo de `assets/`, use um nome novo.
 - Prévia: Netlify, com deploy automático a cada push na main. `_redirects` (rotas e o bloqueio dos arquivos internos, em 404 forçado antes de tudo; a Netlify não aceita `*.md`, então cada `.md` da raiz entra pelo nome) e `_headers` (o mesmo cache). Mudou uma rota, um bloqueio ou um cache num, mude no outro. O Live Server não lê nenhum dos dois.
-- Para conferir as rotas como na Hostinger, use um servidor local que imite as regras do `.htaccess` (raiz em 404, rotas servindo o `index.html`, `/index.html` em 404, endereço inexistente em 404).
+- Para conferir as rotas como na Hostinger: `node scripts/servidor-local.mjs` (porta 5600) imita o `.htaccess`: raiz e `/index.html` em 404 com a `404.html`, as cinco rotas servindo o `index.html`, arquivos internos em 404, cache e compressão brotli. Mudou o `.htaccess`, mude o servidor também.
 
 ## Rotas, checkout e rastreio
 
@@ -58,11 +59,11 @@ Se algo não estiver coberto pela copy nem por este arquivo, pergunte antes de i
 - A `404.html` é simples: fundo da página, o escudo, "Esta página não está disponível." e um link discreto para o Instagram do Marcello; sem botão de compra, sem rastreio, `noindex`, caminhos a partir da raiz.
 - `canonical` e `og:url` das cinco rotas: `https://arsenal-homem-blindado.com.br/bio/`.
 - Checkouts: no topo do script do checkout (fim do `index.html`), o objeto `CHECKOUTS` (`padrao`, `bio`, `sdr`, `tfg`, `story`, `cht`). O script lê o primeiro segmento do caminho e põe o checkout da rota em todos os botões de compra, inclusive o da barra fixa; fora das rotas, usa o `padrao`. Sem JS, os botões levam ao href do HTML, que é o `padrao`. Rota nova: no `CHECKOUTS`, no `.htaccess`, no `_redirects` e no `_headers` (com e sem barra).
-- Enquanto um link do `CHECKOUTS` for placeholder, o botão não leva a lugar nenhum e o console avisa em localhost. Isso bloqueia a publicação (ver `PENDENCIAS.md`).
+- Todo botão de compra é um `<a data-checkout>`. Enquanto o link da rota no `CHECKOUTS` for o `PENDENTE` (qualquer valor que não comece com `https://`), o JS cancela o clique (o botão não leva a lugar nenhum) e o console avisa em localhost; no HTML, os href são `#checkout-pendente`. Isso bloqueia a publicação (ver `PENDENCIAS.md`). Quando os links chegarem: os seis valores do `CHECKOUTS` (o `padrao` com o da bio) e os href dos botões no HTML pelo link do `padrao`.
 - Teste das rotas no localhost: o Live Server não lê o `.htaccess` nem o `_redirects`. Só em `localhost` e `127.0.0.1`, `?origem=bio` (`sdr`, `tfg`, `story`, `cht`) simula a rota; em produção, o parâmetro é ignorado.
 - Repasse de parâmetros: um script curto leva para o link do checkout todos os parâmetros que chegaram na URL (`utm_*`, `src`, `sck`, `fbclid` e o que mais vier). Só `rastreio` e `origem` (chaves de teste do localhost) não vão.
 - Botões de compra abrem o checkout em nova guia (`target="_blank"`, `rel="noopener"`, sem `noreferrer`). No toque (`pointer: coarse`), o JS os deixa na mesma guia, por causa do navegador interno do Instagram.
-- Rastreio: Google Tag Manager no `<head>` (com o `<noscript>` logo após o `<body>`) e Pixel da Meta só com PageView, os dois desligados em localhost. Os IDs são placeholders até o cliente confirmar se o Arsenal usa o mesmo GTM e o mesmo Pixel do Desprezado (ver `PENDENCIAS.md`). Nunca use os IDs do Desprezado sem essa confirmação.
+- Rastreio: Google Tag Manager no `<head>` (com o `<noscript>` logo após o `<body>`) e Pixel da Meta só com PageView, os dois desligados em localhost (`?rastreio=1` liga para teste). Os IDs ficam em `GTM_ID` e `PIXEL_ID`, no primeiro script do `<head>`, e nos dois `<noscript>`; enquanto tiverem "PENDENTE", nada carrega. São placeholders até o cliente confirmar se o Arsenal usa o mesmo GTM e o mesmo Pixel do Desprezado (ver `PENDENCIAS.md`). Nunca use os IDs do Desprezado sem essa confirmação.
 - `InitiateCheckout`: o checkout da Eduzz dispara sozinho ao abrir. A página não dispara esse evento, e o clique de compra não tem evento do pixel.
 - Preço: de R$ 297 por R$ 97 à vista, ou 12x de R$ 10,03. Garantia de 7 dias.
 
@@ -94,8 +95,10 @@ Nenhum neon, roxo, nem o azul do Desprezado. Contraste AA (4,5:1) em todo texto.
 - Vidro: degradê escuro translúcido + `backdrop-filter: blur(16 a 20px)` + borda de 1 px + brilho interno no topo. Só onde há imagem ou luz atrás.
 - Grão sutil por cima da página inteira (`assets/img/grain.png` / `opt/grain.webp`, `mix-blend-mode: overlay`), carregado com a página.
 - Luz: cada seção tem um ponto de luz difusa, nunca fundo chapado.
-- Botão grande (`.cta--grande`) em todos os botões de compra; a barra fixa usa o botão compacto. Anel, seta num círculo em degradê, reflexo que atravessa o botão (desligado com `prefers-reduced-motion`), hover e `:active` como no Desprezado.
-- Ícone da marca: o escudo (SVG). Usado em rótulos, listas e selo de garantia.
+- Botão principal: pílula marfim metálica com texto escuro (o prateado do Desprezado, aquecido para a paleta), dentro de um anel de vidro com borda e brilho carmim, e a seta branca num círculo em degradê `#E0185A` para `#7A0026`. Reflexo que atravessa o botão (desligado com `prefers-reduced-motion`), hover e `:active` como no Desprezado.
+- Botão grande (`.cta--grande`) em todos os botões de compra; a barra fixa usa o botão compacto.
+- Destaques de texto (`.dest`): degradê horizontal carmim para dourado, repetido em cada linha (`box-decoration-break: clone`). O começo carmim tem 3,4:1 sobre o fundo: só em texto grande (títulos e preço). Texto pequeno de cor usa tons claros (o nome do manual nos cards das #brechas em `#E6C990`).
+- Ícone da marca: o escudo (SVG), em dourado (`#escudo-ouro`). Usado em rótulos, listas, checklist (marcado: escudo dourado com o check escuro), selo de garantia, emenda das #brechas e fechamento. O favicon é o mesmo escudo em carmim.
 
 ### Regras que não se negociam
 
@@ -107,15 +110,23 @@ Nenhum neon, roxo, nem o azul do Desprezado. Contraste AA (4,5:1) em todo texto.
 
 ### Hero
 
-Mesmo esquema do hero de livros do Desprezado: art direction com `<picture>` (a imagem vertical até 1023 px, a horizontal a partir de 1024 px), preload do LCP para as duas com as mesmas faixas, `fetchpriority="high"`. No celular e no tablet, a imagem na largura da tela, presa no topo, e o texto começando logo abaixo da base dos livros; ajuste próprio para celulares baixos (até 700 px de altura). No desktop, a imagem presa na borda direita e ampliada até os livros encostarem perto do fim do texto, limitada pela altura do hero. As contas do CSS usam as frações de onde os livros ficam na arte: com a arte do Arsenal, meça de novo.
+Mesmo esquema do hero de livros do Desprezado: art direction com `<picture>` (`hero-arsenal-mobile` até 1023 px, `hero-arsenal-desktop` a partir de 1024 px), preload do LCP para as duas com as mesmas faixas, `fetchpriority="high"`.
+
+- Na arte do celular (1882x3344), os livros vão de 4,7% a 97,2% da largura e de 19,4% a 47,6% da altura: o espaçador do texto usa `.8458 * --fundo-cel-w` (0,476 x 1,7768). Na do desktop (3344x1882), de 49,7% a 96,4% da largura e de 28% a 74% da altura (centro em 51%). Com outra arte, meça de novo e troque essas frações no CSS.
+- Celular e tablet: a imagem na largura da tela, presa no topo, e o texto centrado começando logo abaixo da base dos livros. Celulares baixos (até 700 px de altura): imagem com 88% da largura (78% até 660 px) e 10 px entre os blocos; em 360x640, o botão aparece inteiro na primeira tela.
+- Desktop: a imagem presa na borda direita e ampliada até a borda esquerda dos livros ficar 64 px depois do fim da subheadline, limitada pela altura do hero (livros inteiros, com 80 px de folga em cima e embaixo). O H1 fica no máximo 20 px mais largo que a subheadline, para nunca encostar nos livros.
+
+### Botões com o rótulo longo
+
+"Quero me tornar um Homem Blindado" (hero, oferta e fechamento) leva `.cta--longo` e `.cta-ring--longo`: no celular, anel de 3 px, folgas menores, `.02em` e a fonte de 13 px em 375 px a ~15,3 px em 430 px, para o anel ficar a pelo menos 12 px das bordas da tela (medido: 14, 17 e 16 px). No tablet, o da oferta fica com 16 px (o bloco de preço tem ~496 px por dentro). A partir de 1280 px, o painel da oferta dá 7 das 12 colunas ao bloco de preço. O bloco de compra do fechamento tem 640 px no desktop. Rótulo novo mais longo: meça de novo (nenhum botão pode passar do bloco nem ficar a menos de 12 px da tela).
 
 ## Ordem das seções (com os ids)
 
 1. `#hero`: rótulo (pill com o escudo), H1, subheadline, botão grande e dois cards de vidro (419 mil seguidores, +12 mil homens).
 2. `#identificacao`: checklist interativo de 5 itens com contador, o texto que aparece a partir do primeiro item marcado e o destaque final.
-3. `#brechas`: as quatro brechas, um card por manual com a capa; o card do Arsenal Homem Blindado em destaque. Frase de fechamento e botão.
-4. `#oferta`: o palco com as quatro capas e o Arsenal no centro, a lista e o bloco de preço (com R$ 297 riscado).
-5. `#autor`: o card do Marcello (a mesma foto do Desprezado) e a prova social "Direto da DM" (carrossel com prints de DM), botão.
+3. `#brechas`: cada card tem a brecha (título), o manual que a fecha (com o escudo dourado) e o que ele resolve, com a capa do manual (`capa-*`). O do Arsenal Homem Blindado em destaque: no celular, o mesmo formato horizontal dos outros (capa ao lado do texto), com a capa 20% maior (110 px, contra 92) e o destaque só na borda e no brilho carmim; no tablet, na largura da coluna com a capa ao lado; a partir de 1024 px, na largura toda no topo, e os outros três lado a lado embaixo. Frase de fechamento, botão e, na emenda com a `#oferta`, o escudo que se enche de dourado com a rolagem (no desktop, a foto do palco começa por trás do fim da seção).
+4. `#oferta`: o palco com a mesa vinho (`oferta-mesa-vinho`, a foto da mesa do Desprezado com a parede azul levada para o vinho pelo `scripts/otimizar-imagens.mjs`) e os quatro manuais em pé na ordem da arte do hero (Traição, Iluda, Arsenal, Honra), o Arsenal maior e na frente, os outros girados para dentro; no celular, lado a lado e sem sobreposição (sobrepostos, os títulos eram cortados). Painel com a lista dos quatro manuais (número no círculo) e o bloco de preço (frase, "De R$ 297 por" riscado, "12x de", "R$ 10,03" grande, "ou R$ 97 à vista", botão e nota).
+5. `#autor`: o card do Marcello (a mesma foto do Desprezado, `autor-vinho`: só o fundo azul do estúdio levado para o vinho pelo `scripts/otimizar-imagens.mjs`, com a pele e a roupa protegidas; o blazer também é azul, por isso a máscara e os polígonos medidos em `gerarAutorVinho`) e a prova social "Direto da DM" com subtítulo e apoio: 6 dos 8 prints tratados no Desprezado, os que mais falam de traição, separação, decisão e postura, nesta ordem: 04, 03, 06, 01, 02 e 08. O carrossel do desktop mede 6 x 360 = 2160 px por volta, em 54 s (o JS conta os cards sozinho; no CSS, ajuste os 2160px e os 54s se mudar a quantidade). Botão no fim.
 6. `#faq`: a garantia (`id="garantia"`) e as perguntas.
 7. `#fechamento`: título grande, texto, bloco de compra; depois, o rodapé.
 8. Barra fixa no celular.

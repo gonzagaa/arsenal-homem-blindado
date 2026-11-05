@@ -7,12 +7,10 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# HTML: revalidado a cada visita, para uma atualização aparecer na hora (as rotas, a raiz e as três páginas).
+# HTML: revalidado a cada visita, para uma atualização aparecer na hora (as rotas, a raiz e as duas páginas).
 /
   Cache-Control: no-cache
 /index.html
-  Cache-Control: no-cache
-/links.html
   Cache-Control: no-cache
 /404.html
   Cache-Control: no-cache

@@ -7,7 +7,8 @@
     "imagens": "node otimizar-imagens.mjs",
     "lenis": "node copiar-lenis.mjs",
     "og": "node gerar-og.mjs",
-    "favicons": "node gerar-favicons.mjs"
+    "favicons": "node gerar-favicons.mjs",
+    "servidor": "node servidor-local.mjs"
   },
   "devDependencies": {
     "lenis": "^1.3.27",

@@ -4,25 +4,14 @@ Nada marcado com `.pendente` vai ao ar. Atualize esta lista conforme as resposta
 
 ## Bloqueadores para publicar
 
-- [ ] **Links de checkout:** ainda não chegaram. Um link da Eduzz por rota (bio, sdr, tfg, story e cht). Enquanto o `CHECKOUTS` tiver placeholder, os botões não levam a lugar nenhum.
-- [ ] **GTM e Pixel:** confirmar com o cliente se o Arsenal usa o mesmo GTM e o mesmo Pixel da Meta do Desprezado ou IDs próprios. Até lá, os IDs ficam como placeholder.
+- [ ] **Links de checkout:** ainda não chegaram. Um link da Eduzz por rota (bio, sdr, tfg, story e cht). Hoje o `CHECKOUTS` (fim do `index.html`) tem `PENDENTE` em todas, e os botões não levam a lugar nenhum (o clique é cancelado e o console avisa no localhost). Quando chegarem: os seis valores do `CHECKOUTS` (o `padrao` com o da bio) e os `href="#checkout-pendente"` dos botões no HTML pelo link do `padrao`.
+- [ ] **GTM e Pixel:** confirmar com o cliente se o Arsenal usa o mesmo GTM e o mesmo Pixel da Meta do Desprezado ou IDs próprios. Hoje `GTM_ID` e `PIXEL_ID` (primeiro script do `<head>`) e os dois `<noscript>` têm "PENDENTE", e nada de rastreio carrega. Depois dos IDs reais, medir a performance pelo PageSpeed na prévia da Netlify (ver `PROGRESSO.md`).
 - [ ] **Pixel e token nos cinco checkouts:** confirmar com a gestora o pixel e o token da API de Conversões configurados em cada checkout da Eduzz do Arsenal, e o InitiateCheckout disparando ao abrir cada um.
+- [ ] **Política de privacidade:** a página usa GTM e pixel (cookies). Verificar se existe uma política publicada para linkar no rodapé (LGPD e revisão de anúncios da Meta).
 
 ## Insumos
 
-- [ ] **Mesa da oferta:** a foto da mesa do palco (`assets/img/oferta-mesa.png`, trazida do Desprezado) tem a parede azul. Na Etapa 1, tentar levar a parede para o vinho pelo script de imagens (nome novo); se ficar artificial, o cliente providencia uma mesa nova.
-
-## Confirmar antes de publicar
-
-Estes itens aparecem na página sem a classe `.pendente`, então nada na tela avisa que faltam.
-
-- [ ] "+12 mil homens transformados", "419 mil seguidores" e "2.700+ publicações" (hero e Quem está por trás): números atuais e de onde vêm.
-- [ ] Preço de referência R$ 297 riscado: confirmar que é um preço praticado de verdade (regra de anúncio da Meta e do Código de Defesa do Consumidor).
-- [ ] Garantia de 7 dias: prazo configurado na Eduzz para o produto e as condições que o checkout informa (o texto da garantia remete a elas).
-- [ ] Autorização do Marcello para usar os prints de DM escolhidos (nomes e fotos cobertos). No Desprezado, o print-07 mostra um story com o rosto de uma mulher; se ele for escolhido, confirmar se pode aparecer.
-- [ ] Respostas do FAQ: entrega em PDF por e-mail depois da confirmação do pagamento e o tempo de leitura ("o principal dá para ler numa noite").
-- [ ] Política de privacidade: a página usa GTM e pixel (cookies). Verificar se existe uma política publicada para linkar no rodapé (LGPD e revisão de anúncios da Meta).
-- [ ] Depois do primeiro deploy na Hostinger, conferir no domínio: `/` e `/index.html` respondendo 404 com a `404.html`; /bio/, /sdr/, /tfg/, /story/ e /cht/ abrindo a página; um endereço inventado em 404; http e www indo para https sem www; /docs/, /CLAUDE.md e /.git/config sem abrir; HTML com `Cache-Control: no-cache` e /assets/ com 1 ano; resposta comprimida. O WordPress antigo sai do domínio nesse deploy: conferir se sobra algum arquivo dele na raiz da hospedagem.
+- [ ] **Mesa da oferta:** a parede azul da foto do Desprezado foi levada para o vinho pelo `scripts/otimizar-imagens.mjs` (`oferta-mesa-vinho`; só os tons azuis mudaram, a mesa, o abajur e a poltrona ficaram iguais). Aguardando o cliente aprovar ou mandar uma mesa nova.
 
 ## Marcações `.pendente` na página (0)
 

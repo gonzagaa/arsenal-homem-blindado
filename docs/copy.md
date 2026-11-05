@@ -109,7 +109,7 @@ Ele escreve do jeito que fala nos vídeos. Direto, sem frase de efeito e sem pro
 
 **Prova social (dentro da mesma seção, logo abaixo):**
 - Rótulo: Direto da DM
-- Subtítulo: O que os homens mandam para o Marcello **depois de ler.**
+- Subtítulo: O que os homens mandam para o Marcello **sobre os conteúdos dele.**
 - Apoio: Mensagens reais, enviadas no Instagram. Nomes e fotos cobertos para proteger quem escreveu.
 - Conteúdo: o carrossel com os prints de DM já tratados no De Desprezado a Respeitado, escolhendo os que mais falam de traição, manipulação e postura.
 
